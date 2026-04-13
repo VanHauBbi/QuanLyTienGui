@@ -49,16 +49,18 @@ namespace QuanLyTienGui.Pages.Manager
                         cmd.Connection = conn;
                         cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
+                        string tempSuccess = "";
+
                         if (string.IsNullOrEmpty(MaNhanVien))
                         {
                             cmd.CommandText = "pkg_02_NhanSu.sp_19_ThemNhanVien";
-                            SuccessMsg = $"Đã tiếp nhận hồ sơ nhân viên mới: {HoTen}.";
+                            tempSuccess = $"Đã tiếp nhận hồ sơ nhân viên mới: {HoTen}.";
                         }
                         else
                         {
                             cmd.CommandText = "pkg_02_NhanSu.sp_20_CapNhatNhanVien";
                             cmd.Parameters.AddWithValue("@MaNhanVien", MaNhanVien);
-                            SuccessMsg = $"Đã cập nhật hồ sơ cho nhân viên: {MaNhanVien}.";
+                            tempSuccess = $"Đã cập nhật hồ sơ cho nhân viên: {MaNhanVien}.";
                         }
 
                         cmd.Parameters.AddWithValue("@HoTen", HoTen);
@@ -69,12 +71,45 @@ namespace QuanLyTienGui.Pages.Manager
                         cmd.Parameters.AddWithValue("@NgaySinh", NgaySinh);
 
                         cmd.ExecuteNonQuery();
+
+                        SuccessMsg = tempSuccess;
                     }
                 }
                 return RedirectToPage();
             }
-            catch (SqlException ex) { ErrorMsg = ex.Message; }
-            LoadData(); return Page();
+            catch (SqlException ex)
+            {
+                if (ex.Number == 2627 || ex.Number == 2601)
+                {
+                    if (ex.Message.Contains("CCCD"))
+                        ErrorMsg = "Lỗi: Số CCCD này đã tồn tại trong hệ thống!";
+                    else if (ex.Message.Contains("Email"))
+                        ErrorMsg = "Lỗi: Địa chỉ Email này đã được sử dụng!";
+                    else if (ex.Message.Contains("DienThoai"))
+                        ErrorMsg = "Lỗi: Số điện thoại này đã tồn tại!";
+                    else
+                        ErrorMsg = "Lỗi: Dữ liệu bị trùng lặp (CCCD/Email/SĐT đã tồn tại)!";
+                }
+                else
+                {
+                    string rawMsg = ex.Message;
+                    if (rawMsg.Contains("Lỗi: "))
+                    {
+                        int startIndex = rawMsg.IndexOf("Lỗi: ");
+                        int endIndex = rawMsg.IndexOf("!", startIndex);
+                        if (endIndex == -1) endIndex = rawMsg.IndexOf(".", startIndex);
+                        if (endIndex != -1) ErrorMsg = rawMsg.Substring(startIndex, endIndex - startIndex + 1);
+                        else ErrorMsg = rawMsg.Substring(startIndex);
+                    }
+                    else
+                    {
+                        ErrorMsg = "Lỗi hệ thống: " + ex.Message;
+                    }
+                }
+            }
+
+            LoadData();
+            return Page();
         }
 
         public IActionResult OnPostXoaNhanVien(string MaNVXoa)
@@ -94,8 +129,22 @@ namespace QuanLyTienGui.Pages.Manager
                 }
                 return RedirectToPage();
             }
-            catch (SqlException ex) { ErrorMsg = ex.Message; }
-            LoadData(); return Page();
+            catch (SqlException ex)
+            {
+                string rawMsg = ex.Message;
+                if (rawMsg.Contains("Lỗi: "))
+                {
+                    int startIndex = rawMsg.IndexOf("Lỗi: ");
+                    int endIndex = rawMsg.IndexOf("!", startIndex);
+                    if (endIndex == -1) endIndex = rawMsg.IndexOf(".", startIndex);
+                    if (endIndex != -1) ErrorMsg = rawMsg.Substring(startIndex, endIndex - startIndex + 1);
+                    else ErrorMsg = rawMsg.Substring(startIndex);
+                }
+                else ErrorMsg = "Lỗi: Không thể xóa vì nhân viên này đang có dữ liệu liên kết!";
+            }
+
+            LoadData();
+            return Page();
         }
 
         private void LoadData()
