@@ -18,7 +18,7 @@
     </div>
 
     <div class="col-md-4">
-        <div class="card shadow-sm border-primary">
+        <div class="card shadow-sm border-primary" id="cardForm">
             <div class="card-header bg-primary text-white fw-bold" id="formTitle">
                 ➕ Thêm Loại Tiết Kiệm Mới
             </div>
@@ -28,14 +28,13 @@
 
                     <div class="form-group mb-3">
                         <label class="fw-bold">Tên Gói Tiết Kiệm <span class="text-danger">*</span></label>
-                        <input type="text" asp-for="TenLoai" id="txtTenLoai" class="form-control" required placeholder="VD: Không kỳ hạn, Kỳ hạn 6 tháng..." />
+                        <input type="text" asp-for="TenLoai" id="txtTenLoai" class="form-control" required />
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-6">
                             <label class="fw-bold">Kỳ Hạn (Tháng) <span class="text-danger">*</span></label>
                             <input type="number" asp-for="KyHan" id="txtKyHan" class="form-control" min="0" required />
-                            <small class="text-muted">Nhập 0 nếu không kỳ hạn</small>
                         </div>
                         <div class="col-6">
                             <label class="fw-bold">Tối Thiểu (VNĐ) <span class="text-danger">*</span></label>
@@ -60,6 +59,15 @@
                         </select>
                     </div>
 
+                    <div class="form-group mb-3">
+                        <label class="fw-bold">Trạng Thái Hoạt Động</label>
+                        <select asp-for="TrangThaiApDung" id="cbTrangThai" class="form-select" disabled>
+                            <option value="true">Đang áp dụng</option>
+                            <option value="false">Ngừng áp dụng</option>
+                        </select>
+                        <small id="msgTrangThai" class="text-muted">Mặc định khi tạo mới</small>
+                    </div>
+
                     <div class="form-group mb-4">
                         <label class="fw-bold">Mô tả thêm</label>
                         <textarea asp-for="MoTa" id="txtMoTa" class="form-control" rows="2"></textarea>
@@ -81,10 +89,11 @@
                     <thead class="table-dark">
                         <tr>
                             <th>Mã Loại</th>
-                            <th>Tên Gói Tiết Kiệm</th>
+                            <th>Tên Gói</th>
                             <th>Kỳ Hạn</th>
-                            <th>Mức Tối Thiểu</th>
+                            <th>Tối Thiểu</th>
                             <th>Thao Tác</th>
+                            <th>Trạng Thái</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -100,23 +109,47 @@
                                     }
                                     else
                                     {
-
                                         <span class="badge bg-info text-dark">@item.KyHan Tháng</span>
                                     }
                                 </td>
                                 <td class="text-success fw-bold">@item.SoTienToiThieu.ToString("N0") đ</td>
                                 <td>
                                     <button type="button" class="btn btn-sm btn-outline-primary"
-                                            onclick="editLoai('@item.MaLoai', '@item.TenLoai', @item.KyHan, @item.SoTienToiThieu, '@item.HinhThucTaiTuc', '@item.HinhThucTraLai', '@item.MoTa')">
+                                            onclick="editLoai('@item.MaLoai', '@item.TenLoai', @item.KyHan, @item.SoTienToiThieu, '@item.HinhThucTaiTuc', '@item.HinhThucTraLai', '@item.MoTa', @(item.TrangThaiApDung ? "true" : "false"))">
                                         Sửa
                                     </button>
 
-                                    <form method="post" asp-page-handler="XoaLoai" class="d-inline">
-                                        <input type="hidden" name="MaLoaiXoa" value="@item.MaLoai" />
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa gói @item.TenLoai? Lưu ý: Không thể xóa nếu đã có người gửi gói này.');">
-                                            Xóa
-                                        </button>
-                                    </form>
+                                    @if (item.TrangThaiApDung)
+                                    {
+                                        <form method="post" asp-page-handler="XoaLoai" class="d-inline">
+                                            <input type="hidden" name="MaLoaiXoa" value="@item.MaLoai" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bạn muốn dừng gói tiết kiệm này?');">Dừng</button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form method="post" asp-page-handler="LuuLoai" class="d-inline">
+                                            <input type="hidden" asp-for="MaLoaiTietKiem" value="@item.MaLoai" />
+                                            <input type="hidden" asp-for="TenLoai" value="@item.TenLoai" />
+                                            <input type="hidden" asp-for="KyHan" value="@item.KyHan" />
+                                            <input type="hidden" asp-for="SoTienToiThieu" value="@item.SoTienToiThieu" />
+                                            <input type="hidden" asp-for="HinhThucTaiTuc" value="@item.HinhThucTaiTuc" />
+                                            <input type="hidden" asp-for="HinhThucTraLai" value="@item.HinhThucTraLai" />
+                                            <input type="hidden" asp-for="TrangThaiApDung" value="true" />
+                                            <button type="submit" class="btn btn-sm btn-outline-success">Áp dụng</button>
+                                        </form>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.TrangThaiApDung)
+                                    {
+                                        <span class="badge bg-success">Đang áp dụng</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="badge bg-danger">Ngừng áp dụng</span>
+                                    }
                                 </td>
                             </tr>
                         }
@@ -129,20 +162,31 @@
 
 @section Scripts {
     <script>
-        function editLoai(ma, ten, kyhan, toithieu, taituc, tralai, mota) {
+                function editLoai(ma, ten, kyhan, toithieu, taituc, tralai, mota, trangThai) {
             document.getElementById('txtMaLoai').value = ma;
             document.getElementById('txtTenLoai').value = ten;
             document.getElementById('txtKyHan').value = kyhan;
             document.getElementById('txtToiThieu').value = toithieu;
-            document.getElementById('cbTaiTuc').value = taituc;
-            document.getElementById('cbTraLai').value = tralai;
             document.getElementById('txtMoTa').value = mota;
 
-            document.getElementById('formTitle').innerHTML = '✏️ Cập Nhật Loại Tiết Kiệm: ' + ma;
-            document.getElementById('formTitle').classList.replace('bg-primary', 'bg-warning');
-            document.getElementById('formTitle').classList.replace('text-white', 'text-dark');
-            document.getElementById('btnSubmit').innerHTML = 'Lưu Cập Nhật';
-            document.getElementById('btnSubmit').classList.replace('btn-primary', 'btn-warning');
+            document.getElementById('cbTaiTuc').value = taituc;
+            document.getElementById('cbTraLai').value = tralai;
+
+            var cb = document.getElementById('cbTrangThai');
+            if (cb) {
+                cb.disabled = false;
+                cb.value = trangThai.toString();
+            }
+            document.getElementById('msgTrangThai').innerHTML = "Chế độ chỉnh sửa";
+
+            var formTitle = document.getElementById('formTitle');
+            formTitle.innerHTML = '✏️ Sửa Loại Tiết Kiệm: ' + ma;
+            formTitle.classList.replace('bg-primary', 'bg-warning');
+            formTitle.classList.replace('text-white', 'text-dark');
+
+            var btnSubmit = document.getElementById('btnSubmit');
+            btnSubmit.innerHTML = 'Lưu Cập Nhật';
+            btnSubmit.classList.replace('btn-primary', 'btn-warning');
         }
 
         function resetForm() {
@@ -152,11 +196,21 @@
             document.getElementById('txtToiThieu').value = '';
             document.getElementById('txtMoTa').value = '';
 
-            document.getElementById('formTitle').innerHTML = '➕ Thêm Loại Tiết Kiệm Mới';
-            document.getElementById('formTitle').classList.replace('bg-warning', 'bg-primary');
-            document.getElementById('formTitle').classList.replace('text-dark', 'text-white');
-            document.getElementById('btnSubmit').innerHTML = 'Lưu Thông Tin';
-            document.getElementById('btnSubmit').classList.replace('btn-warning', 'btn-primary');
+            var cb = document.getElementById('cbTrangThai');
+            if (cb) {
+                cb.value = 'true';
+                cb.disabled = true;
+            }
+            document.getElementById('msgTrangThai').innerHTML = "Mặc định khi tạo mới";
+
+            var formTitle = document.getElementById('formTitle');
+            formTitle.innerHTML = '➕ Thêm Loại Tiết Kiệm Mới';
+            formTitle.classList.replace('bg-warning', 'bg-primary');
+            formTitle.classList.replace('text-dark', 'text-white');
+
+            var btnSubmit = document.getElementById('btnSubmit');
+            btnSubmit.innerHTML = 'Lưu Thông Tin';
+            btnSubmit.classList.replace('btn-warning', 'btn-primary');
         }
     </script>
 }

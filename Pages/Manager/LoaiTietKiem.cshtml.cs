@@ -18,8 +18,8 @@ namespace QuanLyTienGui.Pages.Manager
         [BindProperty] public string MoTa { get; set; }
         [BindProperty] public bool TrangThaiApDung { get; set; } = true;
 
-        [TempData] public string SuccessMsg { get; set; }
-        [TempData] public string ErrorMsg { get; set; }
+        [TempData]public string SuccessMsg { get; set; }
+        [TempData]public string ErrorMsg { get; set; }
 
         public class LoaiTietKiemInfo
         {
@@ -45,7 +45,6 @@ namespace QuanLyTienGui.Pages.Manager
                 {
                     conn.Open();
                     SqlCommand cmd;
-
                     if (string.IsNullOrEmpty(MaLoaiTietKiem))
                     {
                         cmd = new SqlCommand("pkg_04_TietKiem.sp_13_ThemLoaiTietKiem", conn);
@@ -68,11 +67,13 @@ namespace QuanLyTienGui.Pages.Manager
                     cmd.Parameters.AddWithValue("@TrangThaiApDung", TrangThaiApDung);
 
                     cmd.ExecuteNonQuery();
+                    ModelState.Clear();
                 }
                 return RedirectToPage();
             }
             catch (SqlException ex) { ErrorMsg = ex.Message; }
-            LoadData(); return Page();
+            LoadData();
+            return Page();
         }
 
         public IActionResult OnPostXoaLoai(string MaLoaiXoa)
@@ -93,7 +94,8 @@ namespace QuanLyTienGui.Pages.Manager
                 return RedirectToPage();
             }
             catch (SqlException ex) { ErrorMsg = ex.Message; }
-            LoadData(); return Page();
+            LoadData();
+            return Page();
         }
 
         private void LoadData()
@@ -102,7 +104,7 @@ namespace QuanLyTienGui.Pages.Manager
             using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("QuanLyTienGuiDB")))
             {
                 conn.Open();
-                using (SqlCommand cmd = new SqlCommand("SELECT * FROM pkg_04_TietKiem.vw_14_LoaiTietKiem_DangApDung", conn))
+                using (SqlCommand cmd = new SqlCommand("SELECT * FROM pkg_04_TietKiem.LOAITIETKIEM", conn))
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
