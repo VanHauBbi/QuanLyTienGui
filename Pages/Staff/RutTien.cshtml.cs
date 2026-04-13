@@ -13,7 +13,6 @@ namespace QuanLyTienGui.Pages.Staff
         [BindProperty(SupportsGet = true)] public string MaSoTietKiem { get; set; }
         public string MaNhanVien { get; set; }
 
-        // CÁC BIẾN LƯU THÔNG TIN HIỂN THỊ
         public string TenKhachHang { get; set; }
         public string TenLoaiTietKiem { get; set; }
         public decimal SoDuHienTai { get; set; }
@@ -21,7 +20,6 @@ namespace QuanLyTienGui.Pages.Staff
         public DateTime NgayDaoHan { get; set; }
         public string TrangThai { get; set; }
 
-        // CÁC BIẾN TÍNH TOÁN NGHIỆP VỤ LÃI
         public int SoNgayDaGui { get; set; }
         public decimal LaiSuatApDung { get; set; }
         public decimal TienLaiDuTinh { get; set; }
@@ -94,7 +92,6 @@ namespace QuanLyTienGui.Pages.Staff
                 using (SqlConnection conn = new SqlConnection(_config.GetConnectionString("QuanLyTienGuiDB")))
                 {
                     conn.Open();
-                    // Câu truy vấn gộp lấy cả Lãi suất hiện tại của gói đó
                     string sql = @"
                         SELECT K.HoTen, L.TenLoai, S.SoTienGui, S.NgayMoSo, S.NgayDaoHan, S.TrangThai, L.KyHan,
                                ISNULL((SELECT TOP 1 PhanTramLai FROM pkg_05_LaiSuat.LAISUAT LS WHERE LS.MaLoaiTietKiem = S.MaLoaiTietKiem AND LS.NgayApDung <= S.NgayMoSo ORDER BY LS.NgayApDung DESC), 0) as PhanTramLai,
@@ -122,7 +119,6 @@ namespace QuanLyTienGui.Pages.Staff
                                 decimal phanTramLaiGoc = Convert.ToDecimal(reader["PhanTramLai"]);
                                 decimal laiKhongKyHan = Convert.ToDecimal(reader["LaiKhongKyHan"]);
 
-                                // TÍNH TOÁN NGHIỆP VỤ CHẶT CHẼ
                                 SoNgayDaGui = (DateTime.Today - NgayMoSo).Days;
 
                                 if (TrangThai != "Đang hoạt động")
@@ -130,14 +126,14 @@ namespace QuanLyTienGui.Pages.Staff
                                     ChoPhepRut = false;
                                     ThongBaoNghiepVu = "Sổ này đã tất toán hoặc đã bị khóa.";
                                     TienLaiDuTinh = 0;
-                                    LaiSuatApDung = 0;
+                                    LaiSuatApDung = phanTramLaiGoc;
                                 }
                                 else if (SoNgayDaGui < 15)
                                 {
                                     ChoPhepRut = false;
                                     ThongBaoNghiepVu = $"Sổ mới gửi được {SoNgayDaGui} ngày. (Quy định: tối thiểu 15 ngày mới được rút).";
                                     TienLaiDuTinh = 0;
-                                    LaiSuatApDung = 0;
+                                    LaiSuatApDung = phanTramLaiGoc;
                                 }
                                 else
                                 {
@@ -150,10 +146,10 @@ namespace QuanLyTienGui.Pages.Staff
                                     }
                                     else
                                     {
-                                        int soNgayQuyDinh = kyHan * 30; // Ước tính 1 tháng = 30 ngày
+                                        int soNgayQuyDinh = kyHan * 30;
                                         if (SoNgayDaGui < soNgayQuyDinh)
                                         {
-                                            LaiSuatApDung = laiKhongKyHan; // Ép về lãi suất không kỳ hạn
+                                            LaiSuatApDung = laiKhongKyHan;
                                             TienLaiDuTinh = SoDuHienTai * (LaiSuatApDung / 100m) * SoNgayDaGui / 365m;
                                             ThongBaoNghiepVu = $"Rút trước hạn. Khách hàng chỉ được hưởng lãi suất Không kỳ hạn ({LaiSuatApDung}%).";
                                         }
@@ -166,7 +162,7 @@ namespace QuanLyTienGui.Pages.Staff
                                     }
                                 }
 
-                                TienLaiDuTinh = Math.Round(TienLaiDuTinh, 0); // Làm tròn tiền VNĐ
+                                TienLaiDuTinh = Math.Round(TienLaiDuTinh, 0);
                                 TongTienNhan = SoDuHienTai + TienLaiDuTinh;
                             }
                             else
