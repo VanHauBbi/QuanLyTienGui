@@ -1,0 +1,165 @@
+﻿@page
+@model QuanLyTienGui.Pages.Manager.CapNhatLaiSuatModel
+@{
+    ViewData["Title"] = "Cập Nhật Biểu Lãi Suất";
+}
+
+<div class="row mt-3">
+    <div class="col-12">
+        <h3 class="text-danger fw-bold mb-4">💰 Ban Hành Biểu Lãi Suất Thị Trường</h3>
+        @if (!string.IsNullOrEmpty(Model.SuccessMsg))
+        {
+            <div class="alert alert-success fw-bold shadow-sm fs-5 text-center">
+                <i class="bi bi-check-circle-fill"></i> @Model.SuccessMsg
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.ErrorMsg))
+        {
+            <div class="alert alert-danger fw-bold shadow-sm fs-5 text-center">
+                <i class="bi bi-exclamation-triangle-fill"></i> @Model.ErrorMsg
+            </div>
+        }
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white fw-bold" id="formTitle">
+                📢 Thiết Lập Mức Lãi Suất Mới
+            </div>
+            <div class="card-body bg-light">
+                <form method="post" asp-page-handler="LuuLaiSuat">
+                    <input type="hidden" asp-for="MaLaiSuat" id="txtMaLaiSuat" />
+
+                    <div class="form-group mb-3" id="boxGoiTietKiem">
+                        <label class="fw-bold">Áp dụng cho Gói Tiết Kiệm <span class="text-danger">*</span></label>
+                        <select asp-for="MaLoaiTietKiem" id="cbMaLoai" class="form-select" required>
+                            <option value="">-- Chọn Gói Tiết Kiệm --</option>
+                            @foreach (var loai in Model.DanhSachLoai)
+                            {
+                                <option value="@loai.MaLoai">@loai.TenLoai</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="fw-bold text-success">Lãi Suất (% / Năm) <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="number" asp-for="PhanTramLai" id="txtPhanTram" class="form-control fw-bold text-success" step="0.01" min="0.1" required placeholder="VD: 5.5" />
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label class="fw-bold text-primary">Ngày Bắt Đầu Áp Dụng <span class="text-danger">*</span></label>
+                        <input type="date" asp-for="NgayApDung" id="txtNgay" class="form-control fw-bold text-primary" required />
+                        <small class="text-muted fst-italic">Lưu ý: Không được chọn ngày trong quá khứ.</small>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-danger fw-bold flex-grow-1 py-2" id="btnSubmit">Ban Hành Lãi Suất</button>
+                        <button type="button" class="btn btn-secondary fw-bold" id="btnCancel" style="display:none;" onclick="resetForm()">Hủy Lệnh</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white fw-bold">
+                Lịch Sử Biến Động Lãi Suất
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped mb-0 text-center align-middle">
+                    <thead class="table-secondary">
+                        <tr>
+                            <th>Mã Cấu Hình</th>
+                            <th>Sản Phẩm Áp Dụng</th>
+                            <th>Mức Lãi Suất</th>
+                            <th>Ngày Hiệu Lực</th>
+                            <th>Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.DanhSachLaiSuat)
+                        {
+                            <tr>
+                                <td class="text-muted">@item.MaLaiSuat</td>
+                                <td class="text-start fw-bold">@item.TenLoaiTietKiem</td>
+                                <td class="text-success fw-bold fs-5">@item.PhanTramLai.ToString("0.##")%</td>
+                                <td>
+                                    @if (item.NgayApDung <= DateTime.Today)
+                                    {
+                                        <span class="badge bg-success">Đang hiệu lực (@item.NgayApDung.ToString("dd/MM/yyyy"))</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">Chờ hiệu lực (@item.NgayApDung.ToString("dd/MM/yyyy"))</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.NgayApDung >= DateTime.Today)
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                                onclick="editLaiSuat('@item.MaLaiSuat', '@item.MaLoaiTietKiem', @item.PhanTramLai, '@item.NgayApDung.ToString("yyyy-MM-dd")')">
+                                            Sửa
+                                        </button>
+
+                                        <form method="post" asp-page-handler="XoaLaiSuat" class="d-inline">
+                                            <input type="hidden" name="MaLaiSuatXoa" value="@item.MaLaiSuat" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hủy bỏ mức lãi suất này?');">
+                                                Hủy
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted fw-bold"><i class="bi bi-lock-fill"></i> Đã chốt</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function editLaiSuat(maLaiSuat, maLoai, phanTram, ngayApDung) {
+            document.getElementById('txtMaLaiSuat').value = maLaiSuat;
+            document.getElementById('cbMaLoai').value = maLoai;
+            document.getElementById('txtPhanTram').value = phanTram;
+            document.getElementById('txtNgay').value = ngayApDung;
+
+            document.getElementById('formTitle').innerHTML = '✏️ Điều Chỉnh Lãi Suất: ' + maLaiSuat;
+            document.getElementById('formTitle').classList.replace('bg-danger', 'bg-warning');
+            document.getElementById('formTitle').classList.replace('text-white', 'text-dark');
+            document.getElementById('btnSubmit').innerHTML = 'Cập Nhật Lãi Suất';
+            document.getElementById('btnSubmit').classList.replace('btn-danger', 'btn-warning');
+            document.getElementById('btnCancel').style.display = 'block';
+
+            document.getElementById('boxGoiTietKiem').style.display = 'none';
+            document.getElementById('cbMaLoai').removeAttribute('required');
+        }
+
+        function resetForm() {
+            document.getElementById('txtMaLaiSuat').value = '';
+            document.getElementById('cbMaLoai').value = '';
+            document.getElementById('txtPhanTram').value = '';
+            document.getElementById('txtNgay').valueAsDate = new Date();
+
+            document.getElementById('formTitle').innerHTML = '📢 Thiết Lập Mức Lãi Suất Mới';
+            document.getElementById('formTitle').classList.replace('bg-warning', 'bg-danger');
+            document.getElementById('formTitle').classList.replace('text-dark', 'text-white');
+            document.getElementById('btnSubmit').innerHTML = 'Ban Hành Lãi Suất';
+            document.getElementById('btnSubmit').classList.replace('btn-warning', 'btn-danger');
+            document.getElementById('btnCancel').style.display = 'none';
+
+            document.getElementById('boxGoiTietKiem').style.display = 'block';
+            document.getElementById('cbMaLoai').setAttribute('required', 'required');
+        }
+    </script>
+}

@@ -1,0 +1,145 @@
+﻿@page
+@model QuanLyTienGui.Pages.Staff.GuiThemTienModel
+@{
+    ViewData["Title"] = "Nạp Tiền Vào Sổ";
+}
+
+<div class="row mt-3">
+    <div class="col-12">
+        <h3 class="text-primary fw-bold mb-4"><i class="bi bi-cash-stack"></i> Giao Dịch Nạp Tiền (Gửi Thêm)</h3>
+
+        @if (!string.IsNullOrEmpty(Model.SuccessMsg))
+        {
+            <div class="alert alert-success fw-bold shadow-sm fs-5">
+                <i class="bi bi-check-circle-fill"></i> @Model.SuccessMsg
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.ErrorMsg))
+        {
+            <div class="alert alert-danger fw-bold shadow-sm">
+                <i class="bi bi-exclamation-triangle-fill"></i> @Model.ErrorMsg
+            </div>
+        }
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-primary mb-3">
+            <div class="card-header bg-primary text-white fw-bold">
+                🔍 Bước 1: Truy Vấn Sổ Tiết Kiệm
+            </div>
+            <div class="card-body bg-light">
+                <form method="post" asp-page-handler="TruyVan">
+                    <div class="form-group mb-3">
+                        <label class="fw-bold mb-1">Mã Sổ Cần Nạp <span class="text-danger">*</span></label>
+                        <input type="text" asp-for="MaSoTietKiem" class="form-control text-uppercase fw-bold border-primary" required placeholder="VD: STK0001" />
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100 fw-bold py-2">
+                        <i class="bi bi-search"></i> LẤY THÔNG TIN SỔ
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.TenKhachHang))
+        {
+            bool isAllowed = Model.TrangThai == "Đang hoạt động" && Model.KyHan == 0;
+
+            <div class="card shadow-sm @(isAllowed ? "border-success" : "border-secondary")">
+                <div class="card-header @(isAllowed ? "bg-success" : "bg-secondary") text-white fw-bold">
+                    💰 Bước 2: Thực Hiện Nạp Tiền
+                </div>
+                <div class="card-body bg-light">
+                    @if (!isAllowed)
+                    {
+                        <div class="alert alert-warning text-dark fw-bold text-center mb-0 p-2">
+                            <i class="bi bi-lock-fill"></i>
+                            @(Model.TrangThai != "Đang hoạt động" ? "Sổ này đã bị khóa/tất toán." : "Sổ có kỳ hạn không hỗ trợ nộp thêm!")
+                        </div>
+                    }
+                    else
+                    {
+                        <form method="post" asp-page-handler="NapTien">
+                            <input type="hidden" asp-for="MaSoTietKiem" />
+                            <div class="form-group mb-4">
+                                <label class="fw-bold text-success mb-2">Số Tiền Khách Nộp (VNĐ) <span class="text-danger">*</span></label>
+                                <input type="number" asp-for="SoTienNhan" id="txtSoTienNhan" class="form-control form-control-lg text-success fw-bold" required min="10000" step="1000" placeholder="Nhập số tiền..." oninput="tinhSoDuMoi()" />
+                            </div>
+                            <button type="submit" class="btn btn-success btn-lg w-100 fw-bold shadow-sm" onclick="return confirm('Xác nhận thu đủ tiền mặt và nạp vào hệ thống?');">
+                                <i class="bi bi-check-circle"></i> XÁC NHẬN NẠP
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm h-100 border-0">
+            <div class="card-header bg-dark text-white fw-bold">
+                👤 Hồ Sơ Đối Chiếu Thông Tin Minh Bạch
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover table-bordered mb-0 align-middle h-100">
+                    @if (!string.IsNullOrEmpty(Model.TenKhachHang))
+                    {
+                        <tbody>
+                            <tr><td class="bg-light fw-bold" style="width:30%">Chủ Sở Hữu</td><td class="text-primary fw-bold fs-5">@Model.TenKhachHang</td></tr>
+                            <tr><td class="bg-light fw-bold">CMND / CCCD</td><td class="fw-bold text-muted">@Model.CCCD</td></tr>
+                            <tr><td class="bg-light fw-bold">Ngày Mở Sổ</td><td>@Model.NgayMoSo.ToString("dd/MM/yyyy")</td></tr>
+                            <tr><td class="bg-light fw-bold">Sản Phẩm Gửi</td><td class="fw-bold">@Model.TenLoai</td></tr>
+                            <tr>
+                                <td class="bg-light fw-bold">Trạng Thái Sổ</td>
+                                <td>
+                                    @if (Model.TrangThai == "Đang hoạt động")
+                                    {
+                                        <span class="badge bg-success fs-6"><i class="bi bi-check-circle"></i> Đang hoạt động</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="badge bg-danger fs-6"><i class="bi bi-x-circle"></i> Đã tất toán / Khóa</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="bg-light fw-bold text-secondary fs-5">Số Dư Hiện Tại</td>
+                                <td class="text-secondary fw-bold fs-4" id="lblSoDuHienTai">@Model.SoDuHienTai.ToString("N0") <span class="fs-6">VNĐ</span></td>
+                            </tr>
+                            <tr class="bg-warning bg-opacity-10">
+                                <td class="fw-bold text-success fs-5">Số Dư Mới (Tạm tính)</td>
+                                <td class="text-success fw-bold display-6" id="lblSoDuMoi">@Model.SoDuHienTai.ToString("N0") <span class="fs-5">VNĐ</span></td>
+                            </tr>
+                        </tbody>
+                    }
+                    else
+                    {
+                        <tbody>
+                            <tr class="h-100">
+                                <td class="text-center p-5 text-muted fst-italic align-middle border-0">
+                                    <i class="bi bi-wallet2 display-1 opacity-25"></i><br /><br />
+                                    Vui lòng nhập Mã Sổ Tiết Kiệm và bấm Truy Vấn để đối chiếu<br />thông tin khách hàng trước khi thực hiện giao dịch nạp tiền.
+                                </td>
+                            </tr>
+                        </tbody>
+                    }
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function tinhSoDuMoi() {
+            var soDuHienTai = @(Model.SoDuHienTai);
+            var input = document.getElementById("txtSoTienNhan").value;
+            var tienNop = input ? parseFloat(input) : 0;
+
+            var soDuMoi = soDuHienTai + tienNop;
+
+            // Format số kiểu VNĐ
+            document.getElementById("lblSoDuMoi").innerHTML = soDuMoi.toLocaleString('vi-VN') + ' <span class="fs-5 text-dark">VNĐ</span>';
+        }
+    </script>
+}

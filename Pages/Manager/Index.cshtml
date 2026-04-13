@@ -1,0 +1,74 @@
+﻿@page
+@model QuanLyTienGui.Pages.Manager.IndexModel
+@{
+    ViewData["Title"] = "Trang chủ Quản Lý";
+}
+
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h2 class="text-dark fw-bold mb-0">TỔNG QUAN KINH DOANH CHI NHÁNH</h2>
+        <p class="text-muted fs-5">Xin chào Quản lý <b>@User.Identity.Name</b>! Dưới đây là tình hình huy động vốn hiện tại.</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <span class="badge bg-warning text-dark fs-6 py-2 px-3 shadow-sm">
+            Cập nhật lúc: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")
+        </span>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMsg))
+{
+    <div class="alert alert-danger fw-bold">@Model.ErrorMsg</div>
+}
+
+<div class="row g-4 mb-5">
+
+    <div class="col-md-12">
+        <div class="card shadow border-0 border-start border-success border-5 bg-light h-100">
+            <div class="card-body p-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="text-muted fw-bold text-uppercase mb-2">Tổng Vốn Huy Động Hiện Tại</h5>
+                    <h1 class="display-4 fw-bold text-success m-0">@Model.TongHuyDongVon.ToString("N0") <span class="fs-3">VNĐ</span></h1>
+                </div>
+                <div class="display-1 text-success opacity-50"><i class="bi bi-bank"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 border-start border-primary border-5 h-100">
+            <div class="card-body p-4">
+                <h6 class="text-muted fw-bold text-uppercase">Khách Hàng Đã Phục Vụ</h6>
+                <h1 class="display-5 fw-bold text-primary m-0">@Model.TongKhachHang <span class="fs-4 text-muted">người</span></h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 border-start border-info border-5 h-100">
+            <div class="card-body p-4">
+                <h6 class="text-muted fw-bold text-uppercase">Sổ Tiết Kiệm Đang Hoạt Động</h6>
+                <h1 class="display-5 fw-bold text-info m-0">@Model.TongSoDangMo <span class="fs-4 text-muted">sổ</span></h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="fw-bold text-secondary mb-3 border-bottom pb-2">Chức năng thường dùng</h4>
+<div class="row g-3">
+    <div class="col-md-4">
+        <a asp-page="/Manager/CapNhatLaiSuat" class="btn btn-danger w-100 py-3 fw-bold fs-5 shadow-sm">
+            📈 Cập Nhật Lãi Suất Mới
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-page="/Manager/PheDuyetBaoCao" class="btn btn-primary w-100 py-3 fw-bold fs-5 shadow-sm">
+            ✅ Phê Duyệt Báo Cáo
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-page="/Manager/QuanLyNhanVien" class="btn btn-dark w-100 py-3 fw-bold fs-5 shadow-sm">
+            👥 Quản Lý Giao Dịch Viên
+        </a>
+    </div>
+</div>

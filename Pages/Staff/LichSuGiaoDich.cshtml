@@ -1,0 +1,69 @@
+﻿@page
+@model QuanLyTienGui.Pages.Staff.LichSuGiaoDichModel
+@{
+    ViewData["Title"] = "Lịch Sử Giao Dịch";
+}
+
+<div class="container-fluid mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-dark fw-bold mb-0"><i class="bi bi-receipt"></i> Lịch Sử Giao Dịch Gần Nhất</h3>
+        <button class="btn btn-secondary d-print-none" onclick="window.print()"><i class="bi bi-printer"></i> In Báo Cáo Đối Soát</button>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <table class="table table-hover table-striped mb-0 text-center align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Mã GD</th>
+                        <th>Mã Sổ Cập Nhật</th>
+                        <th>Loại Giao Dịch</th>
+                        <th>Số Tiền Phát Sinh</th>
+                        <th>Thời Gian Giao Dịch</th>
+                        <th>Mã NV Thực Hiện</th>
+                        <th class="d-print-none">Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var gd in Model.DanhSachGiaoDich)
+                    {
+                        <tr>
+                            <td class="fw-bold text-secondary">@gd.MaGD</td>
+                            <td class="fw-bold text-primary">@gd.MaSo</td>
+                            <td>
+                                <span class="badge @(gd.LoaiGiaoDich.Contains("Nạp") || gd.LoaiGiaoDich.Contains("Mở") ? "bg-success" : "bg-danger")">
+                                    @gd.LoaiGiaoDich
+                                </span>
+                            </td>
+                            <td class="fw-bold @(gd.LoaiGiaoDich.Contains("Rút") || gd.LoaiGiaoDich.Contains("Tất toán") ? "text-danger" : "text-success")">
+                                @(gd.LoaiGiaoDich.Contains("Rút") || gd.LoaiGiaoDich.Contains("Tất toán") ? "-" : "+") @gd.SoTien.ToString("N0") đ
+                            </td>
+                            <td>@gd.NgayGD.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                            <td>@gd.NhanVienThucHien</td>
+                            <td class="d-print-none">
+                                <button class="btn btn-sm btn-outline-dark" onclick="alert('Đang kết nối máy in để in biên lai số: @gd.MaGD'); window.print();">In Biên Lai</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <style>
+        @@media print {
+            .navbar, .footer, .d-print-none {
+                display: none !important;
+            }
+
+            body {
+                background-color: white;
+            }
+
+            .card {
+                border: none !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</div>

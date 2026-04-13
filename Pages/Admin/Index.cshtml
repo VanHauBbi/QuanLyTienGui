@@ -1,0 +1,73 @@
+﻿@page
+@model QuanLyTienGui.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "Trung Tâm Quản Trị";
+}
+
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h2 class="text-danger fw-bold mb-0">TRUNG TÂM QUẢN TRỊ HỆ THỐNG</h2>
+        <p class="text-muted fs-5">Xin chào <b>@User.Identity.Name</b>! Bạn đang đăng nhập với tư cách Quản trị viên cấp cao.</p>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.ErrorMsg))
+{
+    <div class="alert alert-danger fw-bold">@Model.ErrorMsg</div>
+}
+
+<h4 class="fw-bold border-bottom pb-2 mb-4">Tình trạng Phân Quyền Tài Khoản</h4>
+<div class="row g-4 mb-5 text-center">
+
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-top border-dark border-5 h-100 bg-light">
+            <div class="card-body p-4">
+                <h6 class="text-muted fw-bold text-uppercase">Tổng Số Tài Khoản</h6>
+                <h1 class="display-4 fw-bold text-dark m-0">@Model.TongTaiKhoan</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-top border-danger border-5 h-100">
+            <div class="card-body p-4">
+                <h6 class="text-danger fw-bold text-uppercase">Quản Trị Viên (Admin)</h6>
+                <h1 class="display-4 fw-bold text-danger m-0">@Model.SoTaiKhoanAdmin</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-top border-primary border-5 h-100">
+            <div class="card-body p-4">
+                <h6 class="text-primary fw-bold text-uppercase">Quản Lý (Manager)</h6>
+                <h1 class="display-4 fw-bold text-primary m-0">@Model.SoTaiKhoanManager</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 border-top border-success border-5 h-100">
+            <div class="card-body p-4">
+                <h6 class="text-success fw-bold text-uppercase">Giao Dịch Viên (Staff)</h6>
+                <h1 class="display-4 fw-bold text-success m-0">@Model.SoTaiKhoanStaff</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h4 class="fw-bold border-bottom pb-2 mb-3">Lối tắt Quản Trị</h4>
+<div class="row g-3">
+    <div class="col-md-6">
+        <a asp-page="/Admin/QuanLyTaiKhoan" class="btn btn-dark w-100 py-4 fw-bold fs-5 shadow-sm d-flex flex-column align-items-center">
+            <i class="bi bi-person-lines-fill display-4 mb-2 text-warning"></i>
+            Quản Lý Danh Sách Tài Khoản
+        </a>
+    </div>
+    <div class="col-md-6">
+        <a asp-page="/Admin/SaoLuuPhucHoi" class="btn btn-outline-info w-100 py-4 fw-bold fs-5 shadow-sm d-flex flex-column align-items-center text-dark">
+            <i class="bi bi-server display-4 mb-2 text-info"></i>
+            Bảo Trì & Sao Lưu Dữ Liệu
+        </a>
+    </div>
+</div>

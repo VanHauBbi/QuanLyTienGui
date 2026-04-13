@@ -1,0 +1,79 @@
+﻿@page
+@model QuanLyTienGui.Pages.Manager.PheDuyetBaoCaoModel
+@{
+    ViewData["Title"] = "Phê Duyệt Báo Cáo";
+}
+
+<div class="row mt-3">
+    <div class="col-12">
+        <h3 class="text-success fw-bold mb-4">✅ Phê Duyệt Báo Cáo Chốt Ca</h3>
+        @if (!string.IsNullOrEmpty(Model.SuccessMsg))
+        {
+            <div class="alert alert-success fw-bold shadow-sm">@Model.SuccessMsg</div>
+        }
+        @if (!string.IsNullOrEmpty(Model.ErrorMsg))
+        {
+            <div class="alert alert-danger fw-bold shadow-sm">@Model.ErrorMsg</div>
+        }
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped mb-0 text-center align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Mã Báo Cáo</th>
+                            <th>Người Lập</th>
+                            <th>Thời Gian Lập</th>
+                            <th style="width: 30%;">Nội Dung / Ghi Chú</th>
+                            <th>Trạng Thái</th>
+                            <th>Người Duyệt</th>
+                            <th>Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.DanhSachBaoCao.Count == 0)
+                        {
+                            <tr><td colspan="7" class="text-muted py-4">Hiện không có báo cáo nào trong hệ thống.</td></tr>
+                        }
+
+                        @foreach (var bc in Model.DanhSachBaoCao)
+                        {
+                            <tr>
+                                <td class="fw-bold text-secondary">@bc.MaBaoCao</td>
+                                <td class="fw-bold">@bc.NguoiLap</td>
+                                <td>@bc.ThoiGianLap.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="text-start text-muted fst-italic">@bc.NoiDung</td>
+                                <td>
+                                    @if (bc.TrangThai == "Chờ phê duyệt")
+                                    {
+                                        <span class="badge bg-warning text-dark fs-6">Chờ phê duyệt</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success fs-6"><i class="bi bi-check-circle"></i> Đã phê duyệt</span>
+                                    }
+                                </td>
+                                <td class="fw-bold text-success">@bc.NguoiDuyet</td>
+                                <td>
+                                    @if (bc.TrangThai == "Chờ phê duyệt")
+                                    {
+                                        <form method="post" asp-page-handler="Duyet" class="m-0">
+                                            <input type="hidden" name="MaBaoCaoDuyet" value="@bc.MaBaoCao" />
+                                            <button type="submit" class="btn btn-sm btn-primary fw-bold" onclick="return confirm('Xác nhận phê duyệt báo cáo @bc.MaBaoCao?');">
+                                                Duyệt Báo Cáo
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-outline-secondary" disabled>Đã Duyệt</button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

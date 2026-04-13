@@ -1,0 +1,91 @@
+﻿@page
+@model QuanLyTienGui.Pages.Staff.TraCuuSoModel
+@{
+    ViewData["Title"] = "Tra Cứu Sổ Tiết Kiệm";
+}
+
+<div class="container-fluid mt-3">
+    <h3 class="text-info fw-bold mb-4 text-dark">🔎 Tra Cứu Danh Sách Sổ Tiết Kiệm</h3>
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMsg))
+    {
+        <div class="alert alert-success fw-bold shadow-sm">@Model.SuccessMsg</div>
+    }
+    @if (!string.IsNullOrEmpty(Model.ErrorMsg))
+    {
+        <div class="alert alert-danger fw-bold shadow-sm">@Model.ErrorMsg</div>
+    }
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body bg-light">
+            <form method="post" class="d-flex">
+                <input type="text" asp-for="TuKhoa" class="form-control form-control-lg me-2 border-info" placeholder="Nhập Mã Sổ (STK...) hoặc Tên khách hàng để lọc..." />
+                <button type="submit" class="btn btn-info text-white btn-lg px-4 fw-bold">Lọc Dữ Liệu</button>
+                <a asp-page="/Staff/TraCuuSo" class="btn btn-outline-secondary btn-lg ms-2">Làm mới</a>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.DanhSachSo.Count > 0)
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped mb-0 text-center align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Mã Sổ</th>
+                            <th>Khách Hàng</th>
+                            <th>Loại Tiết Kiệm</th>
+                            <th>Số Dư Hiện Tại</th>
+                            <th>Ngày Đáo Hạn</th>
+                            <th>Trạng Thái</th>
+                            <th>Lối Tắt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var so in Model.DanhSachSo)
+                        {
+                            <tr>
+                                <td class="fw-bold text-primary">@so.MaSo</td>
+                                <td class="text-start fw-bold">@so.TenKhachHang</td>
+                                <td>@so.TenLoai</td>
+                                <td class="text-success fw-bold">@so.SoDu.ToString("N0") đ</td>
+                                <td class="@(so.NgayDaoHan <= DateTime.Now ? "text-danger fw-bold" : "")">
+                                    @so.NgayDaoHan.ToString("dd/MM/yyyy")
+                                </td>
+                                <td>
+                                    <span class="badge @(so.TrangThai == "Đang hoạt động" ? "bg-success" : "bg-secondary")">
+                                        @so.TrangThai
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (so.TrangThai == "Đang hoạt động")
+                                    {
+                                        <div class="d-flex justify-content-center gap-1">
+                                            <a asp-page="/Staff/GuiThemTien" asp-route-MaSoTietKiem="@so.MaSo" class="btn btn-sm btn-outline-primary">Nạp</a>
+                                            <a asp-page="/Staff/RutTien" asp-route-MaSoTietKiem="@so.MaSo" class="btn btn-sm btn-outline-danger">Tất Toán</a>
+
+                                            @if (so.NgayDaoHan <= DateTime.Now)
+                                            {
+                                                <form method="post" asp-page-handler="TaiTucSo" class="m-0 p-0">
+                                                    <input type="hidden" name="MaSoTaiTuc" value="@so.MaSo" />
+                                                    <button type="submit" class="btn btn-sm btn-warning fw-bold text-dark" onclick="return confirm('Tiến hành tính lãi và gia hạn (Tái tục) cho sổ @so.MaSo?');">
+                                                        🔄 Tái Tục
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning shadow-sm">Không tìm thấy sổ tiết kiệm nào khớp với yêu cầu của bạn.</div>
+    }
+</div>

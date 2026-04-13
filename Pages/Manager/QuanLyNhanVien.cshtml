@@ -1,0 +1,169 @@
+﻿@page
+@model QuanLyTienGui.Pages.Manager.QuanLyNhanVienModel
+@{
+    ViewData["Title"] = "Quản Lý Nhân Viên";
+}
+
+<div class="row mt-3">
+    <div class="col-12">
+        <h3 class="text-primary fw-bold mb-4"><i class="bi bi-people-fill"></i> Quản Lý Hồ Sơ Nhân Viên</h3>
+        @if (!string.IsNullOrEmpty(Model.SuccessMsg))
+        {
+            <div class="alert alert-success fw-bold shadow-sm">@Model.SuccessMsg</div>
+        }
+        @if (!string.IsNullOrEmpty(Model.ErrorMsg))
+        {
+            <div class="alert alert-danger fw-bold shadow-sm">@Model.ErrorMsg</div>
+        }
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-primary">
+            <div class="card-header bg-primary text-white fw-bold" id="formTitle">
+                📝 Tiếp Nhận Nhân Viên Mới
+            </div>
+            <div class="card-body bg-light">
+                <form method="post" asp-page-handler="LuuNhanVien">
+                    <input type="hidden" asp-for="MaNhanVien" id="txtMaNV" />
+
+                    <div class="form-group mb-3">
+                        <label class="fw-bold">Họ và Tên <span class="text-danger">*</span></label>
+                        <input type="text" asp-for="HoTen" id="txtHoTen" class="form-control text-uppercase" required placeholder="Nhập đầy đủ họ tên..." />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="fw-bold">Số CCCD <span class="text-danger">*</span></label>
+                        <input type="text" asp-for="CCCD" id="txtCCCD" class="form-control" required maxlength="12" placeholder="Nhập 12 số CCCD..." />
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="fw-bold">Số Điện Thoại <span class="text-danger">*</span></label>
+                            <input type="text" asp-for="DienThoai" id="txtDienThoai" class="form-control" required placeholder="Nhập SĐT..." />
+                        </div>
+                        <div class="col-6">
+                            <label class="fw-bold">Ngày Sinh <span class="text-danger">*</span></label>
+                            <input type="date" asp-for="NgaySinh" id="txtNgaySinh" class="form-control" required />
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="fw-bold">Email Công Việc</label>
+                        <input type="email" asp-for="Email" id="txtEmail" class="form-control" placeholder="example@bank.com" />
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label class="fw-bold">Địa Chỉ Thường Trú</label>
+                        <textarea asp-for="DiaChi" id="txtDiaChi" class="form-control" rows="2" placeholder="Nhập địa chỉ cư trú..."></textarea>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary fw-bold flex-grow-1" id="btnSubmit">Lưu Hồ Sơ</button>
+                        <button type="button" class="btn btn-secondary fw-bold" id="btnCancel" style="display: none;" onclick="resetForm()">Hủy</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0 text-center align-middle" style="min-width: 800px;">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Mã NV</th>
+                                <th>Hồ Sơ Cán Bộ</th>
+                                <th>CCCD</th>
+                                <th>Liên Hệ</th>
+                                <th>Tài Khoản</th>
+                                <th>Thao Tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var nv in Model.DanhSachNV)
+                            {
+                                <tr>
+                                    <td class="fw-bold text-primary">@nv.MaNV</td>
+                                    <td class="text-start">
+                                        <span class="fw-bold">@nv.HoTen</span><br />
+                                        <small class="text-muted fw-normal">@(nv.NgaySinh.HasValue? nv.NgaySinh.Value.ToString("dd/MM/yyyy") : "---")</small>
+                                    </td>
+                                    <td>@nv.CCCD</td>
+                                    <td>
+                                        <span>@nv.DienThoai</span><br />
+                                        <small class="text-muted">@nv.Email</small>
+                                    </td>
+                                    <td>
+                                        @if (string.IsNullOrEmpty(nv.Username))
+                                        {
+                                            <span class="badge bg-warning text-dark">Chờ cấp TK</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">@nv.Username</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-outline-primary"
+                                                onclick="editNV('@nv.MaNV', '@nv.HoTen', '@nv.CCCD', '@nv.DienThoai', '@nv.Email', '@nv.DiaChi', '@(nv.NgaySinh.HasValue? nv.NgaySinh.Value.ToString("yyyy-MM-dd") : "")')">
+                                            Sửa
+                                        </button>
+                                        <form method="post" asp-page-handler="XoaNhanVien" class="d-inline">
+                                            <input type="hidden" name="MaNVXoa" value="@nv.MaNV" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Xác nhận xóa hồ sơ nhân viên @nv.HoTen?');">
+                                                Xóa
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function editNV(ma, ten, cccd, sdt, email, diachi, ngaysinh) {
+            document.getElementById('txtMaNV').value = ma;
+            document.getElementById('txtHoTen').value = ten;
+            document.getElementById('txtCCCD').value = cccd;
+            document.getElementById('txtDienThoai').value = sdt;
+            document.getElementById('txtEmail').value = email;
+            document.getElementById('txtDiaChi').value = diachi;
+
+            if(ngaysinh) {
+                document.getElementById('txtNgaySinh').value = ngaysinh;
+            }
+
+            document.getElementById('formTitle').innerHTML = '✏️ Cập Nhật Hồ Sơ: ' + ma;
+            document.getElementById('formTitle').classList.replace('bg-primary', 'bg-warning');
+            document.getElementById('formTitle').classList.replace('text-white', 'text-dark');
+            document.getElementById('btnSubmit').innerHTML = 'Lưu Cập Nhật';
+            document.getElementById('btnSubmit').classList.replace('btn-primary', 'btn-warning');
+            document.getElementById('btnCancel').style.display = 'block';
+        }
+
+        function resetForm() {
+            document.getElementById('txtMaNV').value = '';
+            document.getElementById('txtHoTen').value = '';
+            document.getElementById('txtCCCD').value = '';
+            document.getElementById('txtDienThoai').value = '';
+            document.getElementById('txtEmail').value = '';
+            document.getElementById('txtDiaChi').value = '';
+            document.getElementById('txtNgaySinh').valueAsDate = new Date(new Date().setFullYear(new Date().getFullYear() - 20));
+
+            document.getElementById('formTitle').innerHTML = '📝 Tiếp Nhận Nhân Viên Mới';
+            document.getElementById('formTitle').classList.replace('bg-warning', 'bg-primary');
+            document.getElementById('formTitle').classList.replace('text-dark', 'text-white');
+            document.getElementById('btnSubmit').innerHTML = 'Lưu Hồ Sơ';
+            document.getElementById('btnSubmit').classList.replace('btn-warning', 'btn-primary');
+            document.getElementById('btnCancel').style.display = 'none';
+        }
+    </script>
+}

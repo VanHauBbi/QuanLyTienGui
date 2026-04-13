@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HT Quản Lý Tiền Gửi</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/QuanLyTienGui.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand fw-bold text-primary" asp-area="" asp-page="/Index">🏦 Ngân Hàng Nhóm 3</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark fw-bold" href="#" id="staffMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                👨‍💼 Giao Dịch Viên
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="staffMenu">
+                                <li><a class="dropdown-item" asp-page="/Staff/TraCuu">🔍 Tra cứu Khách hàng</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-page="/Staff/MoSoTietKiem">📒 Mở Sổ Tiết Kiệm</a></li>
+                                <li><a class="dropdown-item" asp-page="/Staff/GuiThemTien">💵 Gửi Thêm Tiền</a></li>
+                                <li><a class="dropdown-item" asp-page="/Staff/RutTien">🏧 Rút Tiền / Tất Toán</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark fw-bold" href="#" id="managerMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                📊 Quản Lý
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="managerMenu">
+                                <li><a class="dropdown-item" href="#">📋 Danh mục Loại Tiết Kiệm</a></li>
+                                <li><a class="dropdown-item" href="#">📈 Cập nhật Biểu Lãi Suất</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#">📑 Xem Báo Cáo Doanh Số</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark fw-bold" href="#" id="adminMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                ⚙️ Admin
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="adminMenu">
+                                <li><a class="dropdown-item" href="#">🔐 Quản lý Tài khoản</a></li>
+                                <li><a class="dropdown-item" href="#">🛡️ Phân quyền hệ thống</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="#">💾 Sao lưu / Phục hồi DB</a></li>
+                            </ul>
+                        </li>
+
+                    </ul>
+
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link text-danger" asp-area="" asp-page="/Index">Đăng xuất</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted mt-5">
+        <div class="container text-center">
+            &copy; 2026 - Đồ án Xây dựng hệ thống quản lý Tiền Gửi Tiết Kiệm - Nhóm 3
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

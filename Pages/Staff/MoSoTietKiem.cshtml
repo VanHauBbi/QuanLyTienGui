@@ -1,0 +1,74 @@
+﻿@page
+@model QuanLyTienGui.Pages.Staff.MoSoTietKiemModel
+@{
+    ViewData["Title"] = "Mở Sổ Mới";
+}
+
+<div class="container-fluid mt-3">
+    <h3 class="text-success fw-bold mb-4"><i class="bi bi-plus-circle-dotted"></i> Giao Dịch Mở Sổ Tiết Kiệm</h3>
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card shadow-sm border-success h-100">
+                <div class="card-header bg-success text-white fw-bold">📋 Thông Tin Đăng Ký</div>
+                <div class="card-body bg-light">
+                    @if (!string.IsNullOrEmpty(Model.SuccessMsg))
+                    {
+                        <div class="alert alert-success fw-bold shadow-sm">@Model.SuccessMsg</div>
+                    }
+                    @if (!string.IsNullOrEmpty(Model.ErrorMsg))
+                    {
+                        <div class="alert alert-danger fw-bold shadow-sm">@Model.ErrorMsg</div>
+                    }
+
+                    <form method="post">
+                        <div class="form-group mb-3">
+                            <label class="fw-bold">Mã Khách Hàng</label>
+                            <input type="text" asp-for="MaKhachHang" class="form-control bg-white fw-bold" readonly />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="fw-bold">Chọn Gói Tiết Kiệm <span class="text-danger">*</span></label>
+                            <select asp-for="MaLoaiTietKiem" class="form-select border-primary fw-bold" required>
+                                <option value="">-- Chọn kỳ hạn --</option>
+                                <option value="LTK0001">Không kỳ hạn (Tối thiểu 100k)</option>
+                                <option value="LTK0002">Kỳ hạn 3 tháng (Lãi 4.5%)</option>
+                                <option value="LTK0003">Kỳ hạn 6 tháng (Lãi 5.8%)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="fw-bold text-success">Số Tiền Gửi Ban Đầu (VNĐ) <span class="text-danger">*</span></label>
+                            <input type="number" asp-for="SoTienGui" class="form-control form-control-lg border-success fw-bold text-success" required min="100000" />
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 fw-bold py-3 fs-5 shadow">
+                            <i class="bi bi-printer"></i> XÁC NHẬN & IN SỔ
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-header bg-dark text-white fw-bold">👤 Hồ Sơ Định Danh Chủ Sổ</div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0 align-middle h-100">
+                        <tbody>
+                            <tr><td class="bg-light fw-bold" style="width:30%">Họ và Tên</td><td class="text-primary fw-bold fs-4">@Model.TenKhachHang</td></tr>
+                            <tr><td class="bg-light fw-bold">Mã Số Định Danh</td><td class="fw-bold">@Model.MaKhachHang</td></tr>
+                            <tr><td class="bg-light fw-bold">Ngày Giao Dịch</td><td>@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</td></tr>
+                            <tr class="h-100">
+                                <td colspan="2" class="text-center p-5 text-muted fst-italic">
+                                    <i class="bi bi-shield-check display-1 opacity-25"></i><br />
+                                    Hệ thống đang sẵn sàng thiết lập hợp đồng tiền gửi mới cho khách hàng này.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

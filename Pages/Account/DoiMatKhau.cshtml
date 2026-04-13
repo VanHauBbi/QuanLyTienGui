@@ -1,0 +1,53 @@
+﻿@page
+@model QuanLyTienGui.Pages.Account.DoiMatKhauModel
+@{
+    ViewData["Title"] = "Đổi Mật Khẩu";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow border-0">
+            <div class="card-header bg-dark text-white text-center py-3">
+                <h5 class="mb-0"><i class="bi bi-key-fill"></i> ĐỔI MẬT KHẨU</h5>
+            </div>
+            <div class="card-body p-4">
+                @if (!string.IsNullOrEmpty(Model.ErrorMsg))
+                {
+                    <div class="alert alert-danger shadow-sm">@Model.ErrorMsg</div>
+                }
+                @if (!string.IsNullOrEmpty(Model.SuccessMsg))
+                {
+                    <div class="alert alert-success shadow-sm text-center">
+                        @Model.SuccessMsg <br /><br />
+                        <a asp-page="/Account/Login" class="btn btn-success px-4">Đăng nhập bằng mật khẩu mới</a>
+                    </div>
+                }
+                else
+                {
+                    <form method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tên đăng nhập</label>
+                            <input type="text" asp-for="TenDangNhap" class="form-control" required placeholder="Nhập tên tài khoản..." />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mật khẩu cũ</label>
+                            <input type="password" asp-for="MatKhauCu" class="form-control" required placeholder="Nhập mật khẩu hiện tại..." />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mật khẩu mới</label>
+                            <input type="password" asp-for="MatKhauMoi" class="form-control" required placeholder="Nhập mật khẩu mới..." />
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Xác nhận mật khẩu mới</label>
+                            <input type="password" asp-for="XacNhanMatKhau" class="form-control" required placeholder="Nhập lại mật khẩu mới..." />
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-dark fw-bold">Cập Nhật Mật Khẩu</button>
+                            <a asp-page="/Account/Login" class="btn btn-outline-secondary">Quay lại</a>
+                        </div>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,72 @@
+﻿@page
+@model QuanLyTienGui.Pages.Staff.TraCuuModel
+@{
+    ViewData["Title"] = "Tra Cứu Khách Hàng";
+}
+
+<div class="container-fluid mt-3">
+    <h3 class="text-primary fw-bold mb-4">👥 Tra Cứu & Quản Lý Khách Hàng</h3>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body bg-light">
+            <form method="post" class="d-flex">
+                <input type="text" asp-for="TuKhoa" class="form-control form-control-lg me-2 border-primary" placeholder="🔍 Nhập tên, CCCD hoặc Số điện thoại để lọc danh sách..." />
+                <button type="submit" class="btn btn-primary btn-lg px-4 fw-bold">Tra Cứu</button>
+                <a asp-page="/Staff/TraCuu" class="btn btn-outline-secondary btn-lg ms-2">Làm mới</a>
+            </form>
+        </div>
+    </div>
+
+    @if (Model.KhachHangs.Count > 0)
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped mb-0 text-center align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Mã KH</th>
+                            <th>Họ Tên Khách Hàng</th>
+                            <th>CCCD</th>
+                            <th>Điện Thoại</th>
+                            <th>Thao Tác Nghiệp Vụ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var kh in Model.KhachHangs)
+                        {
+                            <tr>
+                                <td class="fw-bold text-primary">@kh.MaKH</td>
+                                <td class="text-start fw-bold">@kh.HoTen</td>
+                                <td>@kh.CCCD</td>
+                                <td>@kh.DienThoai</td>
+                                <td class="text-nowrap">
+                                    <a asp-page="/Staff/MoSoTietKiem" asp-route-MaKhachHang="@kh.MaKH" class="btn btn-sm btn-success fw-bold me-1">
+                                        <i class="bi bi-journal-plus"></i> Mở Sổ
+                                    </a>
+
+                                    <a asp-page="/Staff/CapNhatKhachHang" asp-route-MaKhachHang="@kh.MaKH" class="btn btn-sm btn-outline-primary me-1">
+                                        Sửa
+                                    </a>
+
+                                    <form method="post" asp-page-handler="XoaKhachHang" class="d-inline">
+                                        <input type="hidden" name="MaKhachHangXoa" value="@kh.MaKH" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Cảnh báo: Bạn có chắc chắn muốn xóa khách hàng @kh.HoTen không?');">
+                                            Xóa
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning shadow-sm">
+            <h5><i class="bi bi-exclamation-circle"></i> Không tìm thấy khách hàng!</h5>
+            <p class="mb-0">Không có khách hàng nào khớp với từ khóa "<b>@Model.TuKhoa</b>". Vui lòng kiểm tra lại hoặc thêm khách hàng mới.</p>
+        </div>
+    }
+</div>

@@ -1,0 +1,119 @@
+﻿@page
+@model QuanLyTienGui.Pages.Manager.BaoCaoDoanhSoModel
+@{
+    ViewData["Title"] = "Báo Cáo Doanh Số";
+}
+
+<div class="row mt-3">
+    <div class="col-12">
+        <h3 class="text-primary fw-bold mb-3"><i class="bi bi-graph-up-arrow"></i> Báo Cáo Doanh Số & Dòng Tiền</h3>
+
+        <div class="card shadow-sm border-0 mb-4 bg-light">
+            <div class="card-body">
+                <form method="post" class="d-flex align-items-center gap-3">
+                    <label class="fw-bold m-0">Tháng:</label>
+                    <input type="number" asp-for="Thang" class="form-control" min="1" max="12" style="width: 100px;" />
+
+                    <label class="fw-bold m-0">Năm:</label>
+                    <input type="number" asp-for="Nam" class="form-control" min="2020" max="2100" style="width: 120px;" />
+
+                    <button type="submit" class="btn btn-primary fw-bold px-4">Lọc Dữ Liệu</button>
+                </form>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMsg))
+        {
+            <div class="alert alert-danger">@Model.ErrorMsg</div>
+        }
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="alert alert-success shadow-sm">
+                    <h5 class="fw-bold text-success m-0">TỔNG THU (Mở sổ, Nạp tiền): <br /><span class="display-6">@Model.TongThuThang.ToString("N0") đ</span></h5>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="alert alert-danger shadow-sm">
+                    <h5 class="fw-bold text-danger m-0">TỔNG CHI (Rút, Tất toán): <br /><span class="display-6">@Model.TongChiThang.ToString("N0") đ</span></h5>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-7 mb-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white fw-bold">Biểu Đồ Thu / Chi Theo Ngày</div>
+                    <div class="card-body">
+                        <canvas id="doanhSoChart" height="120"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-5 mb-4">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body p-0" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-hover table-striped mb-0 text-center align-middle">
+                            <thead class="table-dark sticky-top">
+                                <tr>
+                                    <th>Ngày</th>
+                                    <th class="text-success">Tổng Thu</th>
+                                    <th class="text-danger">Tổng Chi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.DanhSachDoanhSo.Count == 0)
+                                {
+                                    <tr><td colspan="3" class="text-muted py-3">Không có phát sinh giao dịch trong tháng này.</td></tr>
+                                }
+                                @foreach (var item in Model.DanhSachDoanhSo)
+                                {
+                                    <tr>
+                                        <td class="fw-bold">@item.Ngay / @Model.Thang</td>
+                                        <td class="text-success fw-bold">@item.TongThu.ToString("N0")</td>
+                                        <td class="text-danger fw-bold">@item.TongChi.ToString("N0")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var ctx = document.getElementById('doanhSoChart').getContext('2d');
+
+            var labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartLabels));
+            var dataThu = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartThu));
+            var dataChi = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartChi));
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels.map(x => 'Ngày ' + x),
+                    datasets: [
+                        {
+                            label: 'Tổng Thu (VNĐ)',
+                            data: dataThu,
+                            backgroundColor: 'rgba(25, 135, 84, 0.7)',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Tổng Chi (VNĐ)',
+                            data: dataChi,
+                            backgroundColor: 'rgba(220, 53, 69, 0.7)',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            });
+        });
+    </script>
+}

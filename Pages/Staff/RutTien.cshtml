@@ -1,0 +1,119 @@
+﻿@page
+@model QuanLyTienGui.Pages.Staff.RutTienModel
+@{
+    ViewData["Title"] = "Tất Toán Sổ";
+}
+
+<div class="container-fluid mt-3">
+    <h3 class="text-danger fw-bold mb-4"><i class="bi bi-box-arrow-right"></i> Giao Dịch Tất Toán (Đóng Sổ)</h3>
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success fw-bold shadow-sm fs-5 text-center">
+            <i class="bi bi-check-circle-fill"></i> @Model.SuccessMessage
+        </div>
+    }
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger fw-bold shadow-sm text-center fs-5">
+            <i class="bi bi-exclamation-triangle-fill"></i> @Model.ErrorMessage
+        </div>
+    }
+
+    <div class="card shadow-sm border-0 mb-4 bg-light">
+        <div class="card-body">
+            <form method="post" asp-page-handler="TruyVan" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="fw-bold">Mã Sổ Tiết Kiệm Cần Đóng <span class="text-danger">*</span></label>
+                    <input type="text" asp-for="MaSoTietKiem" class="form-control text-uppercase fw-bold border-danger" required placeholder="VD: STK0001" />
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-danger w-100 fw-bold py-2"><i class="bi bi-search"></i> Kiểm Tra Sổ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.TenKhachHang))
+    {
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card shadow-sm h-100">
+                    <div class="card-header bg-dark text-white fw-bold">
+                        🧾 Hóa Đơn Trích Xuất & Tính Lãi
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-bordered mb-0 align-middle">
+                            <tbody>
+                                <tr><td class="bg-light fw-bold" style="width:35%">Khách Hàng</td><td class="text-primary fw-bold fs-5">@Model.TenKhachHang</td></tr>
+                                <tr><td class="bg-light fw-bold">Sản Phẩm Tiết Kiệm</td><td class="fw-bold">@Model.TenLoaiTietKiem</td></tr>
+                                <tr>
+                                    <td class="bg-light fw-bold">Trạng Thái Sổ</td>
+                                    <td>
+                                        <span class="badge @(Model.TrangThai == "Đang hoạt động" ? "bg-success" : "bg-secondary")">@Model.TrangThai</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light fw-bold">Thời Gian Đã Gửi</td>
+                                    <td class="fw-bold text-dark">
+                                        @Model.SoNgayDaGui Ngày
+                                        <span class="text-muted fw-normal ms-2">(Từ @Model.NgayMoSo.ToString("dd/MM/yyyy"))</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light fw-bold">Tiền Gốc Gửi Vào</td>
+                                    <td class="text-dark fw-bold fs-5">@Model.SoDuHienTai.ToString("N0") <span class="fs-6">VNĐ</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light fw-bold text-success">Lãi Suất Áp Dụng</td>
+                                    <td class="text-success fw-bold">@Model.LaiSuatApDung.ToString("0.##") % / Năm</td>
+                                </tr>
+                                <tr>
+                                    <td class="bg-light fw-bold text-success">Tiền Lãi Tạm Tính</td>
+                                    <td class="text-success fw-bold fs-5">+ @Model.TienLaiDuTinh.ToString("N0") <span class="fs-6">VNĐ</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-5">
+                <div class="card shadow border-danger h-100">
+                    <div class="card-header bg-danger text-white fw-bold">
+                        💰 Lệnh Chi Trả Tiền Mặt
+                    </div>
+                    <div class="card-body bg-light text-center d-flex flex-column justify-content-center">
+                        <p class="text-muted mb-1 fw-bold text-uppercase">TỔNG GỐC VÀ LÃI KHÁCH NHẬN</p>
+                        <h1 class="text-danger fw-bold mb-4 display-5">@Model.TongTienNhan.ToString("N0") <span class="fs-4">đ</span></h1>
+
+                        @if (!Model.ChoPhepRut)
+                        {
+                            <div class="alert alert-danger fw-bold mb-0">
+                                <i class="bi bi-x-circle-fill"></i> @Model.ThongBaoNghiepVu
+                            </div>
+                            <button type="button" class="btn btn-secondary btn-lg w-100 fw-bold py-3 mt-3 shadow-sm" disabled>
+                                KHÔNG THỂ TẤT TOÁN
+                            </button>
+                        }
+                        else
+                        {
+                            if (Model.ThongBaoNghiepVu.Contains("trước hạn"))
+                            {
+                                <div class="alert alert-warning text-dark fw-bold mb-3">
+                                    <i class="bi bi-exclamation-triangle-fill"></i> @Model.ThongBaoNghiepVu
+                                </div>
+                            }
+                            <form method="post" asp-page-handler="TatToan">
+                                <input type="hidden" asp-for="MaSoTietKiem" />
+                                <button type="submit" class="btn btn-danger btn-lg w-100 fw-bold py-3 shadow-sm" onclick="return confirm('Xác nhận xuất @Model.TongTienNhan.ToString("N0") VNĐ cho khách?');">
+                                    <i class="bi bi-cash-coin"></i> XUẤT TIỀN TẤT TOÁN
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

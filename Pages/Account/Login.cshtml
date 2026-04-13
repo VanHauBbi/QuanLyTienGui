@@ -1,0 +1,67 @@
+﻿@page
+@model QuanLyTienGui.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Đăng nhập hệ thống";
+    Layout = null; // Trang đăng nhập không dùng chung Layout có Navbar
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            background-color: #f4f6f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="card login-card">
+        <div class="card-header bg-primary text-white text-center py-3">
+            <h4 class="mb-0 fw-bold">🏦 Ngân Hàng Nhóm 3</h4>
+            <small>Hệ Thống Quản Lý Tiền Gửi</small>
+        </div>
+        <div class="card-body p-4">
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger text-center">@Model.ErrorMessage</div>
+            }
+
+            <form method="post">
+                <div class="mb-3">
+                    <label class="fw-bold mb-1">Tên Đăng Nhập</label>
+                    <input type="text" asp-for="TenDangNhap" class="form-control form-control-lg" required placeholder="Nhập username..." />
+                </div>
+                <div class="mb-4">
+                    <label class="fw-bold mb-1">Mật Khẩu</label>
+                    <input type="password" asp-for="MatKhau" class="form-control form-control-lg" required placeholder="Nhập password..." />
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">Đăng Nhập Hệ Thống</button>
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-page="/Account/QuenMatKhau" class="text-decoration-none text-primary small">
+                        <i class="bi bi-question-circle"></i> Quên mật khẩu?
+                    </a>
+                    <a asp-page="/Account/DoiMatKhau" class="text-decoration-none text-secondary small">
+                        <i class="bi bi-key"></i> Đổi mật khẩu
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

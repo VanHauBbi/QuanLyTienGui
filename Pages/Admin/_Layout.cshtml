@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Quản Trị Hệ Thống (Admin)</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark border-bottom box-shadow mb-4">
+            <div class="container-fluid px-5">
+                <a class="navbar-brand fw-bold text-danger" asp-page="/Admin/Index"><i class="bi bi-shield-lock-fill"></i> System Admin</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1 ms-4 gap-3">
+
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold text-white" asp-page="/Admin/QuanLyTaiKhoan">
+                                <i class="bi bi-people-fill"></i> Quản Lý Tài Khoản & Phân Quyền
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold text-info" asp-page="/Admin/SaoLuuPhucHoi">
+                                <i class="bi bi-database-fill-gear"></i> Sao Lưu / Phục Hồi Dữ Liệu
+                            </a>
+                        </li>
+
+                    </ul>
+
+                    <ul class="navbar-nav">
+                        <li class="nav-item d-flex align-items-center">
+                            <span class="text-white me-3">Role: <span class="badge bg-danger">ADMIN</span></span>
+                            <a class="btn btn-outline-light btn-sm fw-bold px-3" asp-page="/Account/Logout">Đăng xuất</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container-fluid px-5">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

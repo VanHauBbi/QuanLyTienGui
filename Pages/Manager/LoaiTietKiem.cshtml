@@ -1,0 +1,162 @@
+﻿@page
+@model QuanLyTienGui.Pages.Manager.LoaiTietKiemModel
+@{
+    ViewData["Title"] = "Quản Lý Loại Tiết Kiệm";
+}
+
+<div class="row mt-3">
+    <div class="col-12">
+        <h3 class="text-primary fw-bold mb-4">📋 Quản Lý Danh Mục Gói Tiết Kiệm</h3>
+        @if (!string.IsNullOrEmpty(Model.SuccessMsg))
+        {
+            <div class="alert alert-success fw-bold shadow-sm">@Model.SuccessMsg</div>
+        }
+        @if (!string.IsNullOrEmpty(Model.ErrorMsg))
+        {
+            <div class="alert alert-danger fw-bold shadow-sm">@Model.ErrorMsg</div>
+        }
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm border-primary">
+            <div class="card-header bg-primary text-white fw-bold" id="formTitle">
+                ➕ Thêm Loại Tiết Kiệm Mới
+            </div>
+            <div class="card-body bg-light">
+                <form method="post" asp-page-handler="LuuLoai">
+                    <input type="hidden" asp-for="MaLoaiTietKiem" id="txtMaLoai" />
+
+                    <div class="form-group mb-3">
+                        <label class="fw-bold">Tên Gói Tiết Kiệm <span class="text-danger">*</span></label>
+                        <input type="text" asp-for="TenLoai" id="txtTenLoai" class="form-control" required placeholder="VD: Không kỳ hạn, Kỳ hạn 6 tháng..." />
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="fw-bold">Kỳ Hạn (Tháng) <span class="text-danger">*</span></label>
+                            <input type="number" asp-for="KyHan" id="txtKyHan" class="form-control" min="0" required />
+                            <small class="text-muted">Nhập 0 nếu không kỳ hạn</small>
+                        </div>
+                        <div class="col-6">
+                            <label class="fw-bold">Tối Thiểu (VNĐ) <span class="text-danger">*</span></label>
+                            <input type="number" asp-for="SoTienToiThieu" id="txtToiThieu" class="form-control" min="0" required />
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="fw-bold">Hình Thức Tái Tục</label>
+                        <select asp-for="HinhThucTaiTuc" id="cbTaiTuc" class="form-select">
+                            <option value="Nhập lãi vào gốc và gia hạn">Nhập lãi vào gốc và gia hạn</option>
+                            <option value="Không tự động tái tục">Không tự động tái tục (Đóng sổ)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="fw-bold">Hình Thức Trả Lãi</label>
+                        <select asp-for="HinhThucTraLai" id="cbTraLai" class="form-select">
+                            <option value="Cuối kỳ">Trả lãi cuối kỳ</option>
+                            <option value="Đầu kỳ">Trả lãi đầu kỳ</option>
+                            <option value="Định kỳ hàng tháng">Định kỳ hàng tháng</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label class="fw-bold">Mô tả thêm</label>
+                        <textarea asp-for="MoTa" id="txtMoTa" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary fw-bold flex-grow-1" id="btnSubmit">Lưu Thông Tin</button>
+                        <button type="button" class="btn btn-secondary fw-bold" onclick="resetForm()">Hủy Lệnh</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped mb-0 text-center align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Mã Loại</th>
+                            <th>Tên Gói Tiết Kiệm</th>
+                            <th>Kỳ Hạn</th>
+                            <th>Mức Tối Thiểu</th>
+                            <th>Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.DanhSachLoai)
+                        {
+                            <tr>
+                                <td class="fw-bold text-primary">@item.MaLoai</td>
+                                <td class="text-start fw-bold">@item.TenLoai</td>
+                                <td>
+                                    @if (item.KyHan == 0)
+                                    {
+                                        <span class="badge bg-secondary">Không kỳ hạn</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="badge bg-info text-dark">@item.KyHan Tháng</span>
+                                    }
+                                </td>
+                                <td class="text-success fw-bold">@item.SoTienToiThieu.ToString("N0") đ</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                            onclick="editLoai('@item.MaLoai', '@item.TenLoai', @item.KyHan, @item.SoTienToiThieu, '@item.HinhThucTaiTuc', '@item.HinhThucTraLai', '@item.MoTa')">
+                                        Sửa
+                                    </button>
+
+                                    <form method="post" asp-page-handler="XoaLoai" class="d-inline">
+                                        <input type="hidden" name="MaLoaiXoa" value="@item.MaLoai" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Bạn có chắc chắn muốn xóa gói @item.TenLoai? Lưu ý: Không thể xóa nếu đã có người gửi gói này.');">
+                                            Xóa
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function editLoai(ma, ten, kyhan, toithieu, taituc, tralai, mota) {
+            document.getElementById('txtMaLoai').value = ma;
+            document.getElementById('txtTenLoai').value = ten;
+            document.getElementById('txtKyHan').value = kyhan;
+            document.getElementById('txtToiThieu').value = toithieu;
+            document.getElementById('cbTaiTuc').value = taituc;
+            document.getElementById('cbTraLai').value = tralai;
+            document.getElementById('txtMoTa').value = mota;
+
+            document.getElementById('formTitle').innerHTML = '✏️ Cập Nhật Loại Tiết Kiệm: ' + ma;
+            document.getElementById('formTitle').classList.replace('bg-primary', 'bg-warning');
+            document.getElementById('formTitle').classList.replace('text-white', 'text-dark');
+            document.getElementById('btnSubmit').innerHTML = 'Lưu Cập Nhật';
+            document.getElementById('btnSubmit').classList.replace('btn-primary', 'btn-warning');
+        }
+
+        function resetForm() {
+            document.getElementById('txtMaLoai').value = '';
+            document.getElementById('txtTenLoai').value = '';
+            document.getElementById('txtKyHan').value = '';
+            document.getElementById('txtToiThieu').value = '';
+            document.getElementById('txtMoTa').value = '';
+
+            document.getElementById('formTitle').innerHTML = '➕ Thêm Loại Tiết Kiệm Mới';
+            document.getElementById('formTitle').classList.replace('bg-warning', 'bg-primary');
+            document.getElementById('formTitle').classList.replace('text-dark', 'text-white');
+            document.getElementById('btnSubmit').innerHTML = 'Lưu Thông Tin';
+            document.getElementById('btnSubmit').classList.replace('btn-warning', 'btn-primary');
+        }
+    </script>
+}

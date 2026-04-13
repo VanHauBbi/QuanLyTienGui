@@ -1,0 +1,46 @@
+﻿@page
+@model QuanLyTienGui.Pages.Manager.ThongKeTongHopModel
+@{
+    ViewData["Title"] = "Thống Kê Tổng Hợp";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">📈 Tổng Quan Hoạt Động Hệ Thống</h2>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMsg))
+    {
+        <div class="alert alert-danger">@Model.ErrorMsg</div>
+    }
+
+    <div class="row text-center">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3 shadow">
+                <div class="card-header fw-bold fs-5">Tổng Số Khách Hàng</div>
+                <div class="card-body">
+                    <h1 class="card-title display-4 fw-bold">@Model.TongKhachHang</h1>
+                    <p class="card-text">Khách hàng đã đăng ký</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-dark bg-warning mb-3 shadow">
+                <div class="card-header fw-bold fs-5">Sổ Đang Hoạt Động</div>
+                <div class="card-body">
+                    <h1 class="card-title display-4 fw-bold">@Model.TongSoDangMo</h1>
+                    <p class="card-text">Sổ chưa tất toán</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3 shadow">
+                <div class="card-header fw-bold fs-5">Tổng Vốn Huy Động</div>
+                <div class="card-body">
+                    <h2 class="card-title mt-2 fw-bold">@Model.TongHuyDongVon.ToString("N0") <small class="fs-5">VNĐ</small></h2>
+                    <p class="card-text mt-3">Tổng số dư tiền gửi hiện tại</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,264 @@
+﻿@page
+@model QuanLyTienGui.Pages.Admin.QuanLyTaiKhoanModel
+@{
+    ViewData["Title"] = "Quản Lý & Cấp Phát Tài Khoản";
+}
+
+<div class="row mt-3">
+    <div class="col-12">
+        <h3 class="text-dark fw-bold mb-4"><i class="bi bi-people-fill"></i> Quản Lý Phân Quyền Hệ Thống</h3>
+        @if (!string.IsNullOrEmpty(Model.SuccessMsg))
+        {
+            <div class="alert alert-success fw-bold shadow-sm">@Model.SuccessMsg</div>
+        }
+        @if (!string.IsNullOrEmpty(Model.ErrorMsg))
+        {
+            <div class="alert alert-danger fw-bold shadow-sm">@Model.ErrorMsg</div>
+        }
+    </div>
+
+    <div class="col-md-4">
+        <div class="d-flex gap-2 mb-3">
+            <button class="btn btn-outline-dark flex-grow-1 fw-bold active" id="btnTabCapPhat" onclick="setMode('CapPhat')">Cấp phát NV</button>
+            <button class="btn btn-outline-dark flex-grow-1 fw-bold" id="btnTabDocLap" onclick="setMode('ThemDocLap')">Tạo tự do</button>
+        </div>
+
+        <div class="card shadow-sm border-dark">
+            <div class="card-header bg-dark text-white fw-bold" id="formTitle">
+                🔑 Cấp Phát Tài Khoản Mới
+            </div>
+            <div class="card-body bg-light">
+                <form method="post" asp-page-handler="LuuTaiKhoan">
+                    <input type="hidden" asp-for="ActionType" id="txtActionType" />
+                    <input type="hidden" asp-for="MaTaiKhoan" id="txtMaTaiKhoan" />
+
+                    <div class="form-group mb-3" id="divNhanVien">
+                        <label class="fw-bold">Hồ Sơ Nhân Viên (Chờ cấp) <span class="text-danger">*</span></label>
+                        <select asp-for="MaNhanVienDuocCap" class="form-select" id="cbNhanVien">
+                            <option value="">-- Chọn nhân sự --</option>
+                            @foreach (var nv in Model.DanhSachNVChuaCoTK)
+                            {
+                                <option value="@nv.MaNV">[@nv.MaNV] @nv.HoTen</option>
+                            }
+                        </select>
+                        <small class="text-muted fst-italic">Tài khoản cấp cho NV sẽ mặc định mang quyền Staff.</small>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="fw-bold">Tên Đăng Nhập (Username) <span class="text-danger">*</span></label>
+                        <input type="text" asp-for="TenDangNhap" id="txtUsername" class="form-control fw-bold" required placeholder="Ví dụ: nguyenvana" />
+                    </div>
+
+                    <div class="form-group mb-4" id="divVaiTro" style="display: none;">
+                        <label class="fw-bold text-primary">Phân Quyền (Role) <span class="text-danger">*</span></label>
+                        <select asp-for="VaiTroMoi" id="cbVaiTro" class="form-select">
+                            <option value="A">Quản Trị Viên (ADMIN)</option>
+                            <option value="C">Quản Lý Trưởng (MANAGER)</option>
+                            <option value="B">Giao Dịch Viên (STAFF)</option>
+                        </select>
+                    </div>
+
+                    <div class="alert alert-warning py-2 small" id="divCanhBaoPass">
+                        <b>Lưu ý:</b> Mật khẩu khởi tạo hệ thống đặt mặc định là <b>1</b>.
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-dark w-100 fw-bold" id="btnSubmit">Lưu Tài Khoản</button>
+                        <button type="button" class="btn btn-secondary fw-bold" id="btnCancel" style="display: none;" onclick="setMode('CapPhat')">Hủy Sửa</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <table class="table table-hover table-striped mb-0 text-center align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Username</th>
+                            <th>Người Sở Hữu</th>
+                            <th>Quyền Hạn</th>
+                            <th>Thao Tác Bảo Mật</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var tk in Model.DanhSachTK)
+                        {
+                            <tr>
+                                <td class="fw-bold text-primary">@tk.Username</td>
+                                <td class="text-start">@tk.NguoiSoHuu</td>
+                                <td>
+                                    @if (tk.VaiTro == "A")
+                                    {
+                                        <span class="badge bg-danger">ADMIN</span>
+                                    }
+                                    else if (tk.VaiTro == "C")
+                                    {
+
+                                        <span class="badge bg-primary">MANAGER</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="badge bg-success">STAFF</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-center gap-1">
+
+                                        <button type="button" class="btn btn-sm btn-outline-primary fw-bold"
+                                                onclick="setMode('PhanQuyen', '@tk.MaTK', '@tk.Username', '@tk.VaiTro')">
+                                            Phân Quyền
+                                        </button>
+
+                                        @if (tk.Username != User.Identity.Name)
+                                        {
+                                            <form method="post" asp-page-handler="ResetPass" class="m-0">
+                                                <input type="hidden" name="MaTKReset" value="@tk.MaTK" />
+                                                <button type="submit" class="btn btn-sm btn-outline-warning text-dark fw-bold" title="Khôi phục pass về 1" onclick="return confirm('Khôi phục mật khẩu của @tk.Username về mặc định (1)?');">
+                                                    Reset
+                                                </button>
+                                            </form>
+
+                                            <form method="post" asp-page-handler="XoaTaiKhoan" class="m-0">
+                                                <input type="hidden" name="MaTKXoa" value="@tk.MaTK" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger fw-bold" title="Xóa tài khoản" onclick="return confirm('Bạn có chắc chắn muốn xóa tài khoản @tk.Username khỏi hệ thống?');">
+                                                    Xóa
+                                                </button>
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function removeVietnameseTones(str) {
+            str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
+            str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
+            str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
+            str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
+            str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
+            str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
+            str = str.replace(/đ/g, "d");
+            str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
+            str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E");
+            str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
+            str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "O");
+            str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
+            str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
+            str = str.replace(/Đ/g, "D");
+            str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, "");
+            str = str.replace(/\u02C6|\u0306|\u031B/g, "");
+            return str.trim();
+        }
+
+        document.getElementById('cbNhanVien').addEventListener('change', function() {
+            let select = this;
+            let txtUsername = document.getElementById('txtUsername');
+
+            if (select.value === "") {
+                txtUsername.value = "";
+                return;
+            }
+
+            let text = select.options[select.selectedIndex].text;
+            let fullName = text.substring(text.indexOf(']') + 1).trim();
+            let cleanName = removeVietnameseTones(fullName).toLowerCase();
+            let words = cleanName.split(' ');
+
+            if (words.length > 0) {
+                let username = words[words.length - 1];
+                for (let i = 0; i < words.length - 1; i++) {
+                    username += words[i].charAt(0);
+                }
+                txtUsername.value = username;
+            }
+        });
+
+        function setMode(mode, maTK = '', username = '', vaitro = 'B') {
+            document.getElementById('txtActionType').value = mode;
+            document.getElementById('txtMaTaiKhoan').value = maTK;
+
+            let divNhanVien = document.getElementById('divNhanVien');
+            let divVaiTro = document.getElementById('divVaiTro');
+            let txtUser = document.getElementById('txtUsername');
+            let cbVaiTro = document.getElementById('cbVaiTro');
+            let formTitle = document.getElementById('formTitle');
+            let btnSubmit = document.getElementById('btnSubmit');
+            let btnCancel = document.getElementById('btnCancel');
+            let divCanhBao = document.getElementById('divCanhBaoPass');
+
+            document.getElementById('btnTabCapPhat').classList.remove('active');
+            document.getElementById('btnTabDocLap').classList.remove('active');
+
+            if (mode === 'CapPhat') {
+                document.getElementById('btnTabCapPhat').classList.add('active');
+                formTitle.innerText = '🔑 Cấp Phát Cho Nhân Viên';
+                formTitle.className = 'card-header bg-dark text-white fw-bold';
+
+                divNhanVien.style.display = 'block';
+                divVaiTro.style.display = 'none';
+                divCanhBao.style.display = 'block';
+                btnCancel.style.display = 'none';
+
+                txtUser.readOnly = false;
+                txtUser.value = '';
+                btnSubmit.innerText = 'Tạo Tài Khoản Staff';
+                btnSubmit.className = 'btn btn-dark w-100 fw-bold';
+            }
+            else if (mode === 'ThemDocLap') {
+                document.getElementById('btnTabDocLap').classList.add('active');
+                formTitle.innerText = '🛡️ Tạo Tài Khoản Quản Trị (Admin)';
+                formTitle.className = 'card-header bg-secondary text-white fw-bold';
+
+                divNhanVien.style.display = 'none';
+                divVaiTro.style.display = 'block';
+                divCanhBao.style.display = 'block';
+                btnCancel.style.display = 'none';
+
+                txtUser.readOnly = false;
+                txtUser.value = '';
+
+                // GIỚI HẠN CHỈ CHO TẠO ADMIN Ở TAB NÀY
+                cbVaiTro.innerHTML = '<option value="A">Quản Trị Viên (ADMIN)</option>';
+                cbVaiTro.value = 'A';
+
+                btnSubmit.innerText = 'Tạo Tài Khoản Mới';
+                btnSubmit.className = 'btn btn-secondary w-100 fw-bold';
+            }
+            else if (mode === 'PhanQuyen') {
+                formTitle.innerText = '✏️ Sửa / Nâng Quyền Tài Khoản';
+                formTitle.className = 'card-header bg-primary text-white fw-bold';
+
+                divNhanVien.style.display = 'none';
+                divVaiTro.style.display = 'block';
+                divCanhBao.style.display = 'none';
+                btnCancel.style.display = 'block';
+
+                txtUser.readOnly = true;
+                txtUser.value = username;
+
+                // Trả lại các Option khi Nâng Quyền
+                cbVaiTro.innerHTML = `
+                    <option value="A">Quản Trị Viên (ADMIN)</option>
+                    <option value="C">Quản Lý Trưởng (MANAGER)</option>
+                    <option value="B">Giao Dịch Viên (STAFF)</option>
+                `;
+                cbVaiTro.value = vaitro;
+
+                btnSubmit.innerText = 'Lưu Phân Quyền';
+                btnSubmit.className = 'btn btn-primary flex-grow-1 fw-bold';
+            }
+        }
+    </script>
+}

@@ -1,0 +1,76 @@
+﻿@page
+@model QuanLyTienGui.Pages.Admin.SaoLuuPhucHoiModel
+@{
+    ViewData["Title"] = "Bảo Trì & Sao Lưu Dữ Liệu";
+}
+
+<div class="row mt-3">
+    <div class="col-12">
+        <h3 class="text-info fw-bold mb-4"><i class="bi bi-database-fill-gear text-info"></i> Bảo Trì, Sao Lưu & Phục Hồi Dữ Liệu</h3>
+        @if (!string.IsNullOrEmpty(Model.SuccessMsg))
+        {
+            <div class="alert alert-success fw-bold shadow-sm">@Model.SuccessMsg</div>
+        }
+        @if (!string.IsNullOrEmpty(Model.ErrorMsg))
+        {
+            <div class="alert alert-danger fw-bold shadow-sm">@Model.ErrorMsg</div>
+        }
+    </div>
+
+    <div class="col-md-5 mb-4">
+        <div class="card shadow border-info h-100">
+            <div class="card-header bg-info text-dark fw-bold">
+                <i class="bi bi-cloud-arrow-up-fill"></i> Sao Lưu Dữ Liệu (Backup)
+            </div>
+            <div class="card-body bg-light d-flex flex-column justify-content-center align-items-center text-center">
+                <p class="mb-4 text-muted">Tạo một bản sao an toàn cho toàn bộ dữ liệu hiện hành của hệ thống ngân hàng. Dữ liệu sẽ được lưu trữ cục bộ tại máy chủ Server.</p>
+                <form method="post" asp-page-handler="SaoLuu">
+                    <button type="submit" class="btn btn-info btn-lg px-5 fw-bold shadow-sm" onclick="return confirm('Tiến hành sao lưu toàn bộ dữ liệu ngân hàng ngay bây giờ?');">
+                        THỰC HIỆN SAO LƯU NGAY
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7 mb-4">
+        <div class="card shadow border-danger h-100">
+            <div class="card-header bg-danger text-white fw-bold">
+                <i class="bi bi-arrow-counterclockwise"></i> Phục Hồi Dữ Liệu (Restore)
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning py-2 mb-3 shadow-sm border-start border-warning border-4">
+                    <b>CẢNH BÁO NGUY HIỂM:</b> Việc phục hồi sẽ <b>xóa sạch (ghi đè)</b> toàn bộ dữ liệu hiện tại và thay thế bằng dữ liệu từ File Backup được chọn. Mọi giao dịch mới sinh ra sau thời điểm Backup sẽ bị mất vĩnh viễn!
+                </div>
+
+                <form method="post" asp-page-handler="PhucHoi">
+                    <div class="form-group mb-4">
+                        <label class="fw-bold mb-2">Chọn Điểm Khôi Phục (File Backup):</label>
+                        @if (Model.DanhSachFileBackup.Count == 0)
+                        {
+                            <select class="form-select text-danger" disabled>
+                                <option>Chưa có file sao lưu nào trong hệ thống (C:\Backup\)</option>
+                            </select>
+                        }
+                        else
+                        {
+                            <select asp-for="FilePhucHoi" class="form-select bg-light text-primary fw-bold" required>
+                                <option value="">-- Chọn File Dữ Liệu --</option>
+                                @foreach (var file in Model.DanhSachFileBackup)
+                                {
+                                    <option value="@file">@file</option>
+                                }
+                            </select>
+                        }
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-danger fw-bold px-4" @(Model.DanhSachFileBackup.Count == 0 ? "disabled" : "") onclick="return confirm('CẢNH BÁO: BẠN CÓ CHẮC CHẮN MUỐN GHI ĐÈ DỮ LIỆU HIỆN TẠI KHÔNG? Hành động này KHÔNG THỂ HOÀN TÁC!');">
+                            TIẾN HÀNH KHÔI PHỤC
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

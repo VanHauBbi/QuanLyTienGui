@@ -1,0 +1,98 @@
+﻿@page
+@model QuanLyTienGui.Pages.Staff.IndexModel
+@{
+    ViewData["Title"] = "Bảng Điều Khiển - Giao Dịch Viên";
+}
+
+<div class="container mt-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h3 class="text-success fw-bold mb-1">Xin chào, @User.Identity.Name!</h3>
+            <p class="text-muted">Hệ thống quản lý chi nhánh.</p>
+        </div>
+        <div class="col-md-6">
+            <form action="/Staff/TraCuu" method="post" class="d-flex shadow-sm">
+                @Html.AntiForgeryToken()
+                <input type="text" name="TuKhoa" class="form-control form-control-lg border-success text-dark" placeholder="Nhập Tên, CCCD hoặc SĐT..." required />
+                <button type="submit" class="btn btn-success px-4 fw-bold">Tìm Kiếm</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row mb-4 text-center">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 bg-light border-start border-primary border-5 h-100">
+                <div class="card-body py-4">
+                    <h6 class="text-muted fw-bold text-uppercase">Tổng Khách Hàng</h6>
+                    <h2 class="display-6 fw-bold text-primary mb-0">@Model.TongKhachHang</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 bg-light border-start border-success border-5 h-100">
+                <div class="card-body py-4">
+                    <h6 class="text-muted fw-bold text-uppercase">Sổ Mở Hôm Nay</h6>
+                    <h2 class="display-6 fw-bold text-success mb-0">@Model.SoMoHomNay</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 bg-light border-start border-info border-5 h-100">
+                <div class="card-body py-4">
+                    <h6 class="text-muted fw-bold text-uppercase">Sổ Mở Tháng Này</h6>
+                    <h2 class="display-6 fw-bold text-info mb-0">@Model.SoMoThangNay</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white fw-bold text-secondary">
+                    Thống Kê Khối Lượng Mở Sổ (7 Ngày Gần Nhất)
+                </div>
+                <div class="card-body">
+                    <canvas id="moSoChart" height="80"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var ctx = document.getElementById('moSoChart').getContext('2d');
+
+            // Chuyển đổi dữ liệu Model C# thành mảng JavaScript
+            var labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartLabels));
+            var data = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ChartData));
+
+            var chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Số lượng sổ mở',
+                        data: data,
+                        backgroundColor: 'rgba(25, 135, 84, 0.6)',
+                        borderColor: 'rgba(25, 135, 84, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 } // Đảm bảo trục Y hiển thị số nguyên
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

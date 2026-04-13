@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Giao Dịch Viên</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-light bg-light border-bottom box-shadow mb-3">
+            <div class="container-fluid px-5">
+                <a class="navbar-brand fw-bold text-success" asp-page="/Staff/Index">🏦 Quản Lý Giao Dịch</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark fw-bold" href="#" id="navKhachHang" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                👥 Khách Hàng
+                            </a>
+                            <ul class="dropdown-menu shadow-sm" aria-labelledby="navKhachHang">
+                                <li><a class="dropdown-item" asp-page="/Staff/TraCuu">🔍 Tra Cứu & Quản Lý</a></li>
+                                <li><a class="dropdown-item" asp-page="/Staff/ThemKhachHang">➕ Thêm Khách Hàng Mới</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark fw-bold" href="#" id="navSoTK" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                📒 Sổ Tiết Kiệm
+                            </a>
+                            <ul class="dropdown-menu shadow-sm" aria-labelledby="navSoTK">
+                                <li><a class="dropdown-item" asp-page="/Staff/TraCuuSo">🔎 Tra Cứu Thông Tin Sổ</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-page="/Staff/MoSoTietKiem">📒 Thực Hiện Mở Sổ Mới</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark fw-bold" href="#" id="navGiaoDich" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                💰 Giao Dịch
+                            </a>
+                            <ul class="dropdown-menu shadow-sm" aria-labelledby="navGiaoDich">
+                                <li><a class="dropdown-item" asp-page="/Staff/GuiThemTien">💵 Nạp Tiền (Gửi thêm)</a></li>
+                                <li><a class="dropdown-item" asp-page="/Staff/RutTien">🏧 Rút Tiền / Tất Toán</a></li>
+                                <li><a class="dropdown-item" asp-page="/Staff/LichSuGiaoDich">📜 Lịch Sử Giao Dịch</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-dark fw-bold" asp-page="/Staff/LapBaoCao">
+                                📝 Lập Báo Cáo
+                            </a>
+                        </li>
+
+                    </ul>
+
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link text-danger fw-bold" asp-page="/Account/Logout">Đăng xuất</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
