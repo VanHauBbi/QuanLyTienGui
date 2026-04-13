@@ -17,6 +17,22 @@
         </div>
     </div>
 
+    @if (!string.IsNullOrEmpty(Model.ErrorMsg))
+    {
+        <div class="alert alert-danger shadow-sm fw-bold alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i> @Model.ErrorMsg
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMsg))
+    {
+        <div class="alert alert-success shadow-sm fw-bold alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i> @Model.SuccessMsg
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     @if (Model.KhachHangs.Count > 0)
     {
         <div class="card shadow-sm">
@@ -50,7 +66,8 @@
 
                                     <form method="post" asp-page-handler="XoaKhachHang" class="d-inline">
                                         <input type="hidden" name="MaKhachHangXoa" value="@kh.MaKH" />
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Cảnh báo: Bạn có chắc chắn muốn xóa khách hàng @kh.HoTen không?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng @kh.HoTen không?');">
                                             Xóa
                                         </button>
                                     </form>
@@ -66,7 +83,7 @@
     {
         <div class="alert alert-warning shadow-sm">
             <h5><i class="bi bi-exclamation-circle"></i> Không tìm thấy khách hàng!</h5>
-            <p class="mb-0">Không có khách hàng nào khớp với từ khóa "<b>@Model.TuKhoa</b>". Vui lòng kiểm tra lại hoặc thêm khách hàng mới.</p>
+            <p class="mb-0">Không có khách hàng nào khớp với từ khóa "<b>@Model.TuKhoa</b>".</p>
         </div>
     }
 </div>

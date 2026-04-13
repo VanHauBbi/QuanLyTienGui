@@ -20,9 +20,10 @@ namespace QuanLyTienGui.Pages.Staff
             public string DienThoai { get; set; }
             public string Email { get; set; }
         }
+
         public string ErrorMsg { get; set; }
         public string SuccessMsg { get; set; }
-       
+
         public List<KhachHangInfo> KhachHangs { get; set; } = new List<KhachHangInfo>();
 
         public void OnGet()
@@ -71,6 +72,7 @@ namespace QuanLyTienGui.Pages.Staff
                 }
             }
         }
+
         public IActionResult OnPostXoaKhachHang(string MaKhachHangXoa)
         {
             try
@@ -89,10 +91,14 @@ namespace QuanLyTienGui.Pages.Staff
             }
             catch (SqlException ex)
             {
-                ErrorMsg = ex.Message;
+                ErrorMsg = "Cảnh báo hệ thống: " + ex.Message;
+            }
+            catch (Exception ex)
+            {
+                ErrorMsg = "Lỗi hệ thống: " + ex.Message;
             }
 
-            LoadDuLieu(TuKhoa);
+            LoadDuLieu(TuKhoa ?? "");
             return Page();
         }
     }
